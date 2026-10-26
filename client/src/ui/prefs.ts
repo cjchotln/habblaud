@@ -25,6 +25,8 @@ export interface UiPrefs {
   hiddenAccounts: string[];
   /** Habblaud World: aviso quando o primeiro visitante entra no seu prédio (a cada conexão). Ligado por padrão. */
   worldVisitNotify: boolean;
+  /** Limite de FPS do escritório: menos quadros, menos CPU/GPU e calor (ex.: notebook pelo navegador). */
+  frameRate: 'max' | '30' | '15';
 }
 
 export const DEFAULT_PREFS: UiPrefs = {
@@ -40,6 +42,7 @@ export const DEFAULT_PREFS: UiPrefs = {
   feedOpen: true,
   hiddenAccounts: [],
   worldVisitNotify: true,
+  frameRate: 'max',
 };
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
@@ -66,6 +69,7 @@ export function sanitizePrefs(raw: unknown): UiPrefs {
     feedOpen: bool(o.feedOpen, d.feedOpen),
     hiddenAccounts: Array.isArray(o.hiddenAccounts) ? o.hiddenAccounts.filter((x): x is string => typeof x === 'string').slice(0, 20) : [],
     worldVisitNotify: bool(o.worldVisitNotify, d.worldVisitNotify),
+    frameRate: oneOf(o.frameRate, ['max', '30', '15'] as const, d.frameRate),
   };
 }
 
@@ -90,7 +94,7 @@ export function savePrefs(storage: StorageLike | null, prefs: UiPrefs): void {
 
 /** Parte das preferências que o mundo (canvas) consome. */
 export function worldOptionsFrom(p: UiPrefs): Partial<WorldOptions> {
-  return { showNames: p.showNames, bubbles: p.bubbles, liveliness: p.liveliness, dayNight: p.daylight !== 'day', daylight: p.daylight, theme: p.theme };
+  return { showNames: p.showNames, bubbles: p.bubbles, liveliness: p.liveliness, dayNight: p.daylight !== 'day', daylight: p.daylight, theme: p.theme, maxFps: p.frameRate === 'max' ? 0 : Number(p.frameRate) };
 }
 
 /** localStorage com proteção contra navegadores que lançam exceção ao acessá-lo. */

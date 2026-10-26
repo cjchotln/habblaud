@@ -19,6 +19,8 @@ export interface WorldOptions {
   daylight?: DaylightMode;
   /** Tema visual: automático (segue o calendário; ver seasonalThemeFor), nenhum, Natal ou Halloween. */
   theme?: OfficeTheme;
+  /** (Opcional, aditivo) Limite de quadros por segundo do canvas; 0 ou ausente = sem limite (segue a tela). */
+  maxFps?: number;
 }
 
 /** Tema que o renderer desenha: o escritório original ('none') ou um dos sazonais. */

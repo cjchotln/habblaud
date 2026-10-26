@@ -88,6 +88,7 @@ export class SettingsPopover implements UiComponent {
   private bubbles: ReturnType<typeof segmented<UiPrefs['bubbles']>>;
   private liveliness: ReturnType<typeof segmented<UiPrefs['liveliness']>>;
   private daylight: ReturnType<typeof segmented<UiPrefs['daylight']>>;
+  private frameRate: ReturnType<typeof segmented<UiPrefs['frameRate']>>;
   private theme: ReturnType<typeof segmented<UiPrefs['theme']>>;
   private language: ReturnType<typeof segmented<LanguageChoice>>;
   private soundGroup: SoundSettingsGroup;
@@ -141,6 +142,16 @@ export class SettingsPopover implements UiComponent {
       (v) => ctx.updatePrefs({ daylight: v }),
     );
     this.daylight.row.append(h('span', { class: 'ui-set__hint', text: tr('Automático: céu, luzes e sol nas janelas seguem a hora local.') }));
+    this.frameRate = segmented<UiPrefs['frameRate']>(
+      tr('Quadros por segundo'),
+      [
+        ['max', tr('Máximo')],
+        ['30', '30'],
+        ['15', '15'],
+      ],
+      (v) => ctx.updatePrefs({ frameRate: v }),
+    );
+    this.frameRate.row.append(h('span', { class: 'ui-set__hint', text: tr('Menos quadros gastam menos CPU e bateria e esquentam menos o notebook.') }));
     this.theme = segmented<UiPrefs['theme']>(
       tr('Tema do escritório'),
       [['auto', tr('Automático')], ['none', tr('Nenhum')], ['christmas', tr('Natal')], ['halloween', tr('Halloween')]],
@@ -205,6 +216,7 @@ export class SettingsPopover implements UiComponent {
         this.bubbles.row,
         this.liveliness.row,
         this.daylight.row,
+        this.frameRate.row,
       ),
       h(
         'div',
@@ -284,6 +296,7 @@ export class SettingsPopover implements UiComponent {
     this.bubbles.set(p.bubbles);
     this.liveliness.set(p.liveliness);
     this.daylight.set(p.daylight);
+    this.frameRate.set(p.frameRate);
     this.theme.set(p.theme);
     this.language.set(savedLanguage());
     this.soundGroup.render();

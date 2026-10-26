@@ -54,8 +54,17 @@ describe('preferências', () => {
     expect(() => savePrefs(broken, DEFAULT_PREFS)).not.toThrow();
   });
   it('extrai só as opções do mundo', () => {
-    expect(worldOptionsFrom({ ...DEFAULT_PREFS, daylight: 'day' })).toEqual({ showNames: true, bubbles: 'important', liveliness: 'normal', dayNight: false, daylight: 'day', theme: 'auto' });
+    expect(worldOptionsFrom({ ...DEFAULT_PREFS, daylight: 'day' })).toEqual({ showNames: true, bubbles: 'important', liveliness: 'normal', dayNight: false, daylight: 'day', theme: 'auto', maxFps: 0 });
     expect(worldOptionsFrom({ ...DEFAULT_PREFS, daylight: 'night' })).toMatchObject({ dayNight: true, daylight: 'night' });
+  });
+  it('limite de FPS: sem limite por padrão (ninguém perde fluidez ao atualizar); valor inválido volta ao padrão', () => {
+    expect(DEFAULT_PREFS.frameRate).toBe('max');
+    expect(sanitizePrefs({ frameRate: '30' }).frameRate).toBe('30');
+    expect(sanitizePrefs({ frameRate: 30 }).frameRate).toBe('max');
+    expect(sanitizePrefs({ frameRate: '5' }).frameRate).toBe('max');
+    // o mundo recebe número: 0 = segue a tela
+    expect(worldOptionsFrom({ ...DEFAULT_PREFS, frameRate: '15' }).maxFps).toBe(15);
+    expect(worldOptionsFrom(DEFAULT_PREFS).maxFps).toBe(0);
   });
   it('ciclo dia/noite: valida o modo e migra o interruptor antigo', () => {
     expect(DEFAULT_PREFS.daylight).toBe('auto');

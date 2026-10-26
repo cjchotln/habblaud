@@ -273,6 +273,9 @@ export function createWorld(canvas: HTMLCanvasElement, store: OfficeStore, o: Cr
 
   const loop = (ts: number) => {
     raf = requestAnimationFrame(loop);
+    // Limite de FPS: pula o quadro sem mexer em lastTs, então o dt seguinte cobre o tempo pulado.
+    // Folga de 2 ms para o jitter do rAF não derrubar 30 fps em 20 numa tela de 60 Hz.
+    if (options.maxFps && lastTs && ts - lastTs < 1000 / options.maxFps - 2) return;
     const real = Date.now();
     const realDt = lastTs ? Math.min(0.1, Math.max(0, (ts - lastTs) / 1000)) : 1 / 60;
     lastTs = ts;
