@@ -22,6 +22,14 @@ describe('i18n', () => {
     expect(normalizeLocale('en-US')).toBe('en');
     expect(normalizeLocale('es_AR.UTF-8')).toBe('es');
     expect(normalizeLocale('de-DE')).toBeUndefined();
+    // Taiwan, Hong Kong e o tradicional explícito usam o mesmo dicionário; o simplificado não, para não mostrar
+    // caracteres tradicionais a quem pediu simplificado.
+    expect(normalizeLocale('zh-TW')).toBe('zh-TW');
+    expect(normalizeLocale('zh_TW.UTF-8')).toBe('zh-TW');
+    expect(normalizeLocale('zh-Hant-TW')).toBe('zh-TW');
+    expect(normalizeLocale('zh-HK')).toBe('zh-TW');
+    expect(normalizeLocale('zh-CN')).toBeUndefined();
+    expect(normalizeLocale('zh-Hans')).toBeUndefined();
     expect(normalizeLocale('')).toBeUndefined();
     expect(normalizeLocale(null)).toBeUndefined();
   });
@@ -36,6 +44,11 @@ describe('i18n', () => {
     expect(tr('Lendo {0}', ['app.ts'])).toBe('Lit app.ts');
     expect(tr('Texto que ninguém traduziu')).toBe('Texto que ninguém traduziu');
     expect(intlLocale()).toBe('fr-FR');
+  });
+
+  it('em chinês tradicional usa o formato de data e número de Taiwan', () => {
+    setLocale('zh-TW');
+    expect(intlLocale()).toBe('zh-TW');
   });
 
   it('lacunas sem argumento ficam como estão (as nomeadas são preenchidas por quem chama)', () => {

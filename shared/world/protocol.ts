@@ -62,6 +62,10 @@ export const PROTOCOL_VERSION = 1;
 /** Idiomas do mundo (interface, e-mails e avisos). */
 export const WORLD_LOCALES = ['pt-BR', 'en', 'es', 'fr'] as const;
 export type WorldLocale = (typeof WORLD_LOCALES)[number];
+/** Idioma da interface para o mundo: os que o mundo não fala (como o zh-TW) vão em inglês, para o servidor não recusar. */
+export function toWorldLocale(locale: string): WorldLocale {
+  return (WORLD_LOCALES as readonly string[]).includes(locale) ? (locale as WorldLocale) : 'en';
+}
 /** O mesmo que WORLD_LOCALES (nome usado no contrato da Fase 1). */
 export const LOCALES = WORLD_LOCALES;
 

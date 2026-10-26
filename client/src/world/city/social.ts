@@ -21,6 +21,7 @@ import { TILE } from '../../art/api';
 import { h, setHidden, setText } from '../../ui/dom';
 import type { Camera } from '../camera';
 import { modalOpen } from '../input';
+import { wrapLines } from './wrap';
 import { Particles } from '../render/particles';
 import type { CityCards } from './cards';
 import { signRect } from './facade';
@@ -1006,18 +1007,7 @@ export class CitySocial implements CityFx {
     };
     const wrap = (text: string, maxW: number, size: number, weight = 600): string[] => {
       ctx.font = `${weight} ${size.toFixed(1)}px ${UI_FONT}`;
-      const out: string[] = [];
-      let cur = '';
-      for (const word of text.split(' ')) {
-        const next = cur ? `${cur} ${word}` : word;
-        if (ctx.measureText(next).width <= maxW || !cur) cur = next;
-        else {
-          out.push(cur);
-          cur = word;
-        }
-      }
-      if (cur) out.push(cur);
-      return out;
+      return wrapLines(text, maxW, (line) => ctx.measureText(line).width);
     };
     ctx.save();
     ctx.textBaseline = 'middle';
