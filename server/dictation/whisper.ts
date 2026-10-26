@@ -22,6 +22,8 @@ export interface WhisperSetup {
   ffmpeg: string;
   model: string;
   langs: string[];
+  /** Texto de contexto (HABBLAUD_DICTATION_PROMPT): puxa o estilo da saída, ex.: chinês tradicional em vez de simplificado. */
+  prompt?: string;
 }
 
 export interface Transcript {
@@ -57,7 +59,8 @@ export function findWhisper(env: NodeJS.ProcessEnv = process.env, exists: (p: st
     .split(',')
     .map((l) => l.trim().toLowerCase())
     .filter((l) => /^[a-z]{2,3}$/.test(l));
-  return { bin, ffmpeg, model, langs: langs.length ? langs : [...DEFAULT_LANGS] };
+  const prompt = env.HABBLAUD_DICTATION_PROMPT?.trim();
+  return { bin, ffmpeg, model, langs: langs.length ? langs : [...DEFAULT_LANGS], ...(prompt ? { prompt } : {}) };
 }
 
 function run(bin: string, args: string[], timeoutMs: number): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -82,6 +85,11 @@ export function parseWhisperJson(raw: string): Transcript {
   return { text, lang: typeof d.result?.language === 'string' ? d.result.language : '' };
 }
 
+/** Argumentos do whisper-cli para uma passada; o prompt vai nas duas passadas, para a saída manter o mesmo estilo. */
+export function whisperArgs(setup: WhisperSetup, lang: string, wav: string, out: string): string[] {
+  return ['-m', setup.model, '-l', lang, ...(setup.prompt ? ['--prompt', setup.prompt] : []), '-f', wav, '-nt', '-np', '-oj', '-of', out];
+}
+
 /** Transcritor com o whisper-cli; a pasta temporária some no fim, com ou sem erro. */
 export function createWhisperTranscriber(setup: WhisperSetup, timeoutMs = TRANSCRIBE_TIMEOUT_MS): Transcriber {
   return async (audio) => {
@@ -94,7 +102,7 @@ export function createWhisperTranscriber(setup: WhisperSetup, timeoutMs = TRANSC
       if (!conv.ok) throw new Error(tr('não deu para ler o áudio ({0})', [conv.error]));
       const pass = async (lang: string): Promise<Transcript> => {
         const out = join(dir, `out-${lang}`);
-        const r = await run(setup.bin, ['-m', setup.model, '-l', lang, '-f', wav, '-nt', '-np', '-oj', '-of', out], timeoutMs);
+        const r = await run(setup.bin, whisperArgs(setup, lang, wav, out), timeoutMs);
         if (!r.ok) throw new Error(tr('o Whisper falhou ({0})', [r.error]));
         return parseWhisperJson(readFileSync(`${out}.json`, 'utf8'));
       };

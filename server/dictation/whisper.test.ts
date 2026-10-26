@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findWhisper, parseWhisperJson } from './whisper';
+import { findWhisper, parseWhisperJson, whisperArgs } from './whisper';
 
 describe('Whisper local', () => {
   it('lê texto e idioma do JSON do whisper-cli, sem marcas de silêncio', () => {
@@ -17,5 +17,22 @@ describe('Whisper local', () => {
     expect(findWhisper({ HOME: '/h', PATH: '' }, (p) => have.has(p))).toHaveProperty('missing');
     expect(findWhisper({ HOME: '/h', PATH: '' }, () => false)).toEqual({ missing: 'whisper-cli (brew install whisper-cpp)' });
     expect(findWhisper({ HOME: '/h', PATH: '', HABBLAUD_DICTATION_LANGS: 'en, pt, xx-bad' }, () => true)).toMatchObject({ langs: ['en', 'pt'] });
+  });
+});
+
+describe('prompt do ditado', () => {
+  const base = { bin: 'w', ffmpeg: 'f', model: 'm.bin', langs: ['zh', 'en'] };
+
+  it('sem HABBLAUD_DICTATION_PROMPT, os argumentos ficam como sempre', () => {
+    expect(findWhisper({ HOME: '/h', PATH: '' }, () => true)).not.toHaveProperty('prompt');
+    expect(whisperArgs(base, 'auto', 'a.wav', 'o')).toEqual(['-m', 'm.bin', '-l', 'auto', '-f', 'a.wav', '-nt', '-np', '-oj', '-of', 'o']);
+  });
+
+  it('com o prompt, o Whisper o recebe: sem ele, o chinês sai em caracteres simplificados mesmo para quem fala de Taiwan', () => {
+    const setup = findWhisper({ HOME: '/h', PATH: '', HABBLAUD_DICTATION_PROMPT: '  請使用繁體字。 ' }, () => true);
+    expect(setup).toMatchObject({ prompt: '請使用繁體字。' });
+    expect(whisperArgs({ ...base, prompt: '請使用繁體字。' }, 'auto', 'a.wav', 'o')).toEqual([
+      '-m', 'm.bin', '-l', 'auto', '--prompt', '請使用繁體字。', '-f', 'a.wav', '-nt', '-np', '-oj', '-of', 'o',
+    ]);
   });
 });
