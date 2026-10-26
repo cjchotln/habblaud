@@ -391,6 +391,8 @@ export interface AccessInfo {
   terminal: boolean;
   /** Pode abrir agentes novos no app do Claude (POST /api/spawn). */
   spawn: boolean;
+  /** Pode editar o personagem (PUT|DELETE /api/agents/:id/character). Ausente em servidores antigos. */
+  character?: boolean;
   /**
    * Pode usar a conta do Habblaud World (/api/world/*): recurso ligado (HABBLAUD_WORLD), trava do terminal e porta local
    * com Host local. Ausente em servidores antigos.

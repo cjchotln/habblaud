@@ -411,6 +411,24 @@ describe('porta remota', () => {
     expect((await request(t.localBase, '/api/spawn', { method: 'POST', body: { folder: 'relativa', prompt: '' } })).status).toBe(400);
   });
 
+  it('personagem: pela porta remota só com character liberado; na porta local continua como antes', async () => {
+    const s = await start(['permissions', 'messages', 'terminal', 'spawn']);
+    const cookie = await login(s.remoteBase);
+    const body = { name: 'Nina', seed: 1, parts: {} };
+    const off = await request(s.remoteBase, '/api/agents/a1/character', { method: 'PUT', body, headers: { Cookie: cookie } });
+    expect(off.status).toBe(403);
+    expect(off.body).toMatch(/HABBLAUD_REMOTE_ALLOW/);
+    expect(JSON.parse((await request(s.remoteBase, '/api/access', { headers: { Cookie: cookie } })).body).character).toBe(false);
+    expect(JSON.parse((await request(s.localBase, '/api/access')).body).character).toBe(true);
+
+    const t = await start(['character']);
+    const c2 = await login(t.remoteBase);
+    expect(JSON.parse((await request(t.remoteBase, '/api/access', { headers: { Cookie: c2 } })).body).character).toBe(true);
+    // Passa a trava: o 403 sai, e quem responde é o escritório (a1 não existe aqui).
+    const on = await request(t.remoteBase, '/api/agents/a1/character', { method: 'PUT', body, headers: { Cookie: c2 } });
+    expect(on.status).not.toBe(403);
+  });
+
   it('login com o corpo pela metade não trava o login de mais ninguém', async () => {
     const s = await start();
     const hanging = http.request(new URL('/api/remote/login', s.remoteBase), {
@@ -584,14 +602,16 @@ describe('GET /api/access (o que a página pode fazer)', () => {
       messages: false,
       terminal: false,
       spawn: false,
+      character: false,
       world: false,
     });
-    expect(JSON.parse((await request(h.localBase, '/api/access')).body)).toEqual({ remote: false, local: true, permissions: true, messages: true, terminal: false, spawn: true, world: true });
+    expect(JSON.parse((await request(h.localBase, '/api/access')).body)).toEqual({ remote: false, local: true, permissions: true, messages: true, terminal: false, spawn: true, character: true, world: true });
     expect(JSON.parse((await request(h.localBase, '/api/access', { headers: { Host: '192.168.1.5:4747' } })).body)).toMatchObject({
       local: false,
       permissions: false,
       messages: false,
       spawn: false,
+      character: false,
       world: false,
     });
     expect((await request(h.remoteBase, '/api/access')).status).toBe(401);

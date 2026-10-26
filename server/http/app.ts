@@ -398,6 +398,7 @@ export function createApiHandler(deps: ApiDeps): (req: IncomingMessage, res: Ser
           messages: !!deps.messages && trusted(req, 'messages'),
           terminal: !!terminals && trusted(req, 'terminal'),
           spawn: !!deps.spawn && trusted(req, 'spawn'),
+          character: !!deps.terminal && trusted(req, 'character'),
           world: !!deps.world && !!deps.terminal && !remote && isLoopbackHost(req.headers.host),
         };
         sendJson(res, 200, access);
@@ -461,11 +462,12 @@ export function createApiHandler(deps: ApiDeps): (req: IncomingMessage, res: Ser
     }
     const characterMatch = CHARACTER_ROUTE.exec(path);
     if (characterMatch) {
-      // Mudar o personagem age sobre o escritório: a mesma trava do terminal (bind local + Host local).
+      // Mudar o personagem age sobre o escritório: a mesma trava do terminal (bind local + Host local); pela porta remota,
+      // só com "character" em HABBLAUD_REMOTE_ALLOW.
       if (method !== 'PUT' && method !== 'DELETE') methodNotAllowed(res, 'PUT, DELETE');
       else if (!deps.terminal) {
         sendJson(res, 403, { error: tr('editar o personagem desligado: só funciona com o Habblaud acessível apenas pelo próprio computador') });
-      } else if (!trusted(req)) {
+      } else if (!trusted(req, 'character')) {
         sendJson(res, 403, { error: denied(req, tr('o personagem só é editado pelo próprio computador (http://localhost ou http://127.0.0.1)')) });
       } else {
         let id: string;
