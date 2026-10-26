@@ -1398,4 +1398,22 @@ export const ZH_TW: Readonly<Record<string, string>> = {
   "Vocês deixam de se ver: na rua, nos prédios, nos cumprimentos e nos carimbos.": "你們將互相看不到對方：街上、大樓裡、問候和印章都一樣。",
   "Denunciado": "已檢舉",
   "Denunciar": "檢舉",
+
+  // client/src/ui/world/world-popups.ts (convite do Habblaud World)
+  "Novidade: Habblaud World": "新功能：Habblaud World",
+  "Seu escritório agora pode virar um prédio numa cidade online, aceso enquanto os seus agentes trabalham.": "你的辦公室現在可以變成線上城市裡的一棟大樓，代理人工作時燈會亮著。",
+  "Seu escritório vira um prédio numa cidade em pixel art, aceso enquanto os seus agentes trabalham.": "你的辦公室會變成像素風城市裡的一棟大樓，代理人工作時燈會亮著。",
+  "Crie um personagem, ande pela cidade e visite os prédios de outras pessoas.": "建立角色，在城市裡散步，參觀別人的大樓。",
+  "Cumprimente quem passa e deixe likes nos prédios, sem chat e sem spam.": "跟路過的人打招呼、幫大樓按讚，沒有聊天也沒有垃圾訊息。",
+  "Nada do seu trabalho sai do computador: só o tema, quantos andares e se cada personagem está ocupado ou à toa.": "你的工作內容不會離開電腦：只會傳出主題、樓層數，以及每個角色是忙碌還是閒置。",
+  "Ver a lista": "查看清單",
+  "Nada é enviado enquanto você não criar a conta. O acesso é liberado aos poucos, por lista de espera.": "在你建立帳號之前不會傳送任何資料。開放方式是候補名單，分批開放。",
+  "Criar conta": "建立帳號",
+  "Agora não": "暫時不要",
+  "Não mostrar de novo": "不再顯示",
+  "Você está na lista de espera": "你已在候補名單中",
+  "O acesso é liberado aos poucos, em lotes. Avisamos por e-mail quando chegar a sua vez.": "我們會分批開放，輪到你時會寄 e-mail 通知。",
+  "Enquanto isso, o Habblaud continua normal e nada do escritório é enviado.": "在這段期間，Habblaud 照常運作，辦公室的資料不會傳送出去。",
+  "Entendi": "知道了",
+  "Chegou a sua vez: crie o seu personagem e entre na cidade.": "輪到你了：建立你的角色，進入城市吧。",
 };
